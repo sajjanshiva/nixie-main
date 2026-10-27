@@ -1,0 +1,102 @@
+@import "tailwindcss";
+@import "../styles/theme.css";
+
+/* ---------- Base ---------- */
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px; /* sticky header */
+}
+body {
+  background: var(--mint);
+  color: var(--ink);
+  font-family: var(--font-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+::selection {
+  background: var(--cyan);
+  color: var(--ink);
+}
+:focus-visible {
+  outline: 2px solid var(--teal-deep);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Type helpers ---------- */
+@utility font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Clean architectural hairline dividers (no dashed stitch lines) */
+@utility stitch-x {
+  background-color: currentColor;
+  opacity: 0.18;
+  height: 1px;
+}
+@utility stitch-y {
+  background-color: currentColor;
+  opacity: 0.18;
+  width: 1px;
+}
+
+/* Masonry (Pinterest-style) grid with plain CSS columns */
+@utility masonry {
+  column-gap: 14px;
+  columns: 2;
+  @media (width >= 48rem) { columns: 3; column-gap: 18px; }
+  @media (width >= 80rem) { columns: 4; }
+  & > * { break-inside: avoid; margin-bottom: 14px; }
+  @media (width >= 48rem) { & > * { margin-bottom: 18px; } }
+}
+
+/* Analysing scan line */
+@keyframes nx-scan {
+  0% { transform: translateY(-10%); }
+  50% { transform: translateY(1000%); }
+  100% { transform: translateY(-10%); }
+}
+@keyframes nx-shimmer {
+  100% { transform: translateX(100%); }
+}
+.nx-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #e2f3f3;
+}
+.nx-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: nx-shimmer 1.4s infinite;
+}
+
+/* Hide number arrows on numeric inputs */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* Small keyframes used by dialogs / sheets */
+@keyframes nx-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes nx-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes nx-pop-in {
+  from { opacity: 0; transform: translate(-50%, -48%) scale(0.96); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes nx-slide-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes nx-slide-out-right { from { transform: translateX(0); } to { transform: translateX(100%); } }
+@keyframes nx-slide-in-left { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes nx-slide-out-left { from { transform: translateX(0); } to { transform: translateX(-100%); } }

@@ -1,0 +1,109 @@
+/* =====================================================================
+   NIXIE THEME — the ONE place to change the look of the whole site
+   (customer website + admin). Change a value here and every page updates.
+
+   Palette from Nixie's founder:
+     Primary 1  #279da4  teal   → main brand colour (big blocks, brand moments)
+     Primary 2  #54ebeb  cyan   → supporting colour (highlights, focus, accents)
+     Tertiary   #ffc43a  yellow → small attention points (badges, little marks)
+     Texts      #000000  black
+     Bg colour  #f0fffe  mint
+
+   Readability note: white text on #279da4 is only readable at big sizes, so
+   buttons/links use a deeper shade of the same teal (--teal-deep).
+   ===================================================================== */
+
+:root {
+  /* Brand */
+  --mint: #f0fffe;          /* page background f0fffe*/
+  --ink: #000000;           /* text */
+  --teal: #279da4;          /* Primary 1: brand surfaces, large headings */
+  --teal-deep: #1d7a80;     /* buttons & links with white text (5:1) */
+  --teal-deeper: #155f64;   /* hover/pressed state of the above */
+  --cyan: #54ebeb;          /* Primary 2 */
+  --cyan-soft: #d4fafa;     /* light cyan tint for chips, selected states */
+  --yellow: #ffc43a;        /* Tertiary */
+  --yellow-soft: #fff1cc;
+
+  /* Neutrals */
+  --surface: #ffffff;       /* cards, inputs */
+  --muted: #4a5f60;         /* secondary text (6.6:1 on mint) */
+  --line: #cfe6e6;          /* borders, dividers */
+  --line-strong: #9cc9ca;
+
+  /* Status */
+  --danger: #b42318;
+  --danger-soft: #fdecea;
+  --success: #0b7a4b;
+  --success-soft: #dff6ea;
+
+  /* Shape — Architectural editorial fashion cut (sharp, modern, non-bubbly) */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  /* Shadow (used rarely, for floating things only) */
+  --shadow-float: 0 18px 50px -18px rgba(13, 74, 78, 0.35);
+
+  /* Fonts: --font-display is loaded in app/layout.js (Instrument Serif) */
+  --font-text: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* Tailwind reads these, so classes like bg-teal, text-muted, rounded-lg work. */
+@theme inline {
+  --color-mint: var(--mint);
+  --color-ink: var(--ink);
+  --color-teal: var(--teal);
+  --color-teal-deep: var(--teal-deep);
+  --color-teal-deeper: var(--teal-deeper);
+  --color-cyan: var(--cyan);
+  --color-cyan-soft: var(--cyan-soft);
+  --color-yellow: var(--yellow);
+  --color-yellow-soft: var(--yellow-soft);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-float: var(--shadow-float);
+
+  --font-sans: var(--font-text);
+  --font-display: var(--font-heading), "Times New Roman", serif;
+}
+
+/* =====================================================================
+   ADMIN PANEL colours ("Deep teal" option chosen from the preview).
+   ===================================================================== */
+:root {
+  --admin-side: #155f64;                      /* sidebar: deep shade of Nixie teal */
+  --admin-side-text: rgba(255, 255, 255, 0.86);
+  --admin-side-muted: rgba(255, 255, 255, 0.62);
+  --admin-side-line: rgba(255, 255, 255, 0.14);
+  --admin-side-hover: rgba(255, 255, 255, 0.08);
+  --admin-side-active: var(--cyan);           /* current page */
+  --admin-side-active-text: var(--ink);
+  --admin-hero: #000000;                      /* the one highlighted stat card */
+  --admin-hero-num: var(--cyan);
+}
+
+@theme inline {
+  --color-admin-side: var(--admin-side);
+  --color-admin-side-text: var(--admin-side-text);
+  --color-admin-side-muted: var(--admin-side-muted);
+  --color-admin-side-line: var(--admin-side-line);
+  --color-admin-side-hover: var(--admin-side-hover);
+  --color-admin-side-active: var(--admin-side-active);
+  --color-admin-side-active-text: var(--admin-side-active-text);
+  --color-admin-hero: var(--admin-hero);
+  --color-admin-hero-num: var(--admin-hero-num);
+}

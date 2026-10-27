@@ -1,0 +1,40 @@
+{
+  "name": "nixie-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Nixie website backend: Express API for AI outfit analysis, leads, gallery, invoices and Cashfree payments",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon -e js,json,env --watch src --watch .env src/index.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@google/genai": "^1.20.0",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.1.0",
+    "file-type": "^22.2.0",
+    "google-auth-library": "^9.15.1",
+    "google-spreadsheet": "^4.1.4",
+    "helmet": "^8.1.0",
+    "imagekit": "^6.0.0",
+    "multer": "^2.0.2",
+    "node-cron": "^4.6.0",
+    "nodemailer": "^10.1.2",
+    "pg": "^8.16.3",
+    "sharp": "^0.35.5",
+    "zod": "^3.25.76"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
