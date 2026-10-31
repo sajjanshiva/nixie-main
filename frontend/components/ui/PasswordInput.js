@@ -10,6 +10,7 @@ const PasswordInput = forwardRef(function PasswordInput(props, ref) {
       <Input ref={ref} type={show ? "text" : "password"} className="pr-12" {...props} />
       <button
         type="button"
+        suppressHydrationWarning
         onClick={() => setShow((s) => !s)}
         className="absolute inset-y-0 right-1 my-auto flex size-10 items-center justify-center rounded-full text-muted transition hover:text-ink"
         aria-label={show ? "Hide password" : "Show password"}

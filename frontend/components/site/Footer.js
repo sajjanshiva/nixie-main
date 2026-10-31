@@ -4,7 +4,7 @@ import { Mail } from "lucide-react";
 import Logo from "@/components/ui/Logo";
 import InstagramIcon from "@/components/ui/InstagramIcon";
 import { useMeta } from "@/components/providers/MetaProvider";
-import { QUICK_LINKS, TAGLINE } from "@/lib/content";
+import { FOOTER_LINKS, TAGLINE } from "@/lib/content";
 
 export default function Footer() {
   const { meta } = useMeta();
@@ -40,11 +40,21 @@ export default function Footer() {
 
         <div>
           <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-cyan">Quick links</h2>
-          {/* Pages for these come later (before going live), so they are not links yet. */}
           <ul className="mt-5 grid grid-cols-2 gap-x-8 gap-y-3.5 sm:grid-cols-3">
-            {QUICK_LINKS.map((l) => (
-              <li key={l} className="text-[14.5px] text-white/80">
-                {l}
+            {FOOTER_LINKS.map((item) => (
+              <li key={item.label} className="text-[14.5px]">
+                {item.href ? (
+                  <Link
+                    href={item.href}
+                    className="text-white/80 transition-colors duration-150 hover:text-cyan"
+                  >
+                    {item.label}
+                  </Link>
+                ) : (
+                  <span className="text-white/40 cursor-default select-none">
+                    {item.label}
+                  </span>
+                )}
               </li>
             ))}
           </ul>

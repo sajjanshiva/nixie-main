@@ -31,8 +31,8 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en-IN" className={headingFont.variable}>
-      <body className="min-h-dvh">
+    <html lang="en-IN" className={headingFont.variable} suppressHydrationWarning>
+      <body className="min-h-dvh" suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

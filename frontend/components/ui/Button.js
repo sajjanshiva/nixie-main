@@ -97,7 +97,7 @@ export default function Button({
     );
   }
   return (
-    <button type={type} className={cls} disabled={disabled || loading} aria-busy={loading || undefined} {...props}>
+    <button type={type} suppressHydrationWarning className={cls} disabled={disabled || loading} aria-busy={loading || undefined} {...props}>
       {content}
     </button>
   );

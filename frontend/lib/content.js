@@ -63,19 +63,20 @@ export const FAQS = [
   { q: "Can we pay by cash on delivery?", a: "Since every outfit is custom made, we accept prepaid payments only." },
 ];
 
-// Footer quick links: names only for now (pages come later, before going live).
-export const QUICK_LINKS = [
-  "About Nixie",
-  "FAQs",
-  "Fabrics",
-  "Careers",
-  "Collaborate with Nixie",
-  "Contact",
-  "Policies",
-  "Shipping & Delivery",
-  "Returns & Cancellations",
-  "Terms of Service",
+// Footer quick links
+export const FOOTER_LINKS = [
+  { label: "About Nixie", href: null },
+  { label: "FAQs", href: "/#faqs" },
+  { label: "Careers", href: null },
+  { label: "Collaborate with Nixie", href: null },
+  { label: "Contact", href: "/contact" },
+  { label: "Shipping & Delivery", href: "/shipping" },
+  { label: "Returns & Cancellations", href: "/refund-policy" },
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Terms of Service", href: "/terms-of-service" },
 ];
+
+export const QUICK_LINKS = FOOTER_LINKS.map((item) => item.label);
 
 export const TAGLINE = "Outfits you dream up, made for you.";
 

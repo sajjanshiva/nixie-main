@@ -8,6 +8,7 @@ const Input = forwardRef(function Input({ className, invalid, ...props }, ref) {
   return (
     <input
       ref={ref}
+      suppressHydrationWarning
       className={cn(fieldBase, "h-12", invalid ? "ring-danger" : "ring-line-strong hover:ring-[#7fb5b6]", className)}
       {...props}
     />
@@ -19,6 +20,7 @@ export const Textarea = forwardRef(function Textarea({ className, invalid, rows 
   return (
     <textarea
       ref={ref}
+      suppressHydrationWarning
       rows={rows}
       className={cn(fieldBase, "resize-y py-3 leading-relaxed", invalid ? "ring-danger" : "ring-line-strong hover:ring-[#7fb5b6]", className)}
       {...props}
