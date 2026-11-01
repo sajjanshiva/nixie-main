@@ -61,7 +61,7 @@ export default function GalleryAdmin() {
         <EmptyState
           icon={Images}
           title={q ? "No images match" : "The gallery is empty"}
-          text={q ? "Try another word." : "Upload up to 5 images at a time. AI suggests a title and tags for each."}
+          text={q ? "Try another word." : "Upload up to 10 images at a time. AI suggests a title and tags for each."}
           action={!q && <Button href="/admin/gallery/upload">Upload images</Button>}
         />
       ) : (

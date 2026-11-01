@@ -65,10 +65,10 @@ export const FAQS = [
 
 // Footer quick links
 export const FOOTER_LINKS = [
-  { label: "About Nixie", href: null },
+  { label: "About Nixie", href: "/about-nixie" },
   { label: "FAQs", href: "/#faqs" },
-  { label: "Careers", href: null },
-  { label: "Collaborate with Nixie", href: null },
+  { label: "Careers", href: "/careers" },
+  { label: "Collaborate with Nixie", href: "/collaborate" },
   { label: "Contact", href: "/contact" },
   { label: "Shipping & Delivery", href: "/shipping" },
   { label: "Returns & Cancellations", href: "/refund-policy" },

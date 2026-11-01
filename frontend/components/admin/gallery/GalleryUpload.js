@@ -16,7 +16,7 @@ import { adminApi } from "@/lib/adminApi";
 import { checkImageFile, compressImage } from "@/lib/compress";
 import { cn } from "@/lib/cn";
 
-const MAX = 5;
+const MAX = 10;
 const BIG = 4 * 1024 * 1024; // files above 4 MB are shrunk (2400px, 92% quality)
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 let seq = 0;
@@ -40,7 +40,7 @@ export default function GalleryUpload() {
     const files = Array.from(fileList || []);
     if (!files.length) return;
     const room = MAX - cards.length;
-    if (room <= 0) return setPickError("Max 5 images at a time. Publish these first.");
+    if (room <= 0) return setPickError("Max 10 images at a time. Publish these first.");
     const problems = [];
     const ok = [];
     for (const f of files) {
@@ -48,7 +48,7 @@ export default function GalleryUpload() {
       if (p) problems.push(`${f.name}: ${p}`);
       else ok.push(f);
     }
-    if (ok.length > room) problems.push(`Only ${room} more image${room === 1 ? "" : "s"} can be added (max 5 at a time).`);
+    if (ok.length > room) problems.push(`Only ${room} more image${room === 1 ? "" : "s"} can be added (max 10 at a time).`);
     if (problems.length) setPickError(problems.join(" "));
     const chosen = ok.slice(0, room);
     if (!chosen.length) return;
@@ -166,7 +166,7 @@ export default function GalleryUpload() {
           </Link>
         }
         title="Upload images"
-        subtitle="Max 5 images at a time. AI suggests a title and tags; you can edit everything before publishing."
+        subtitle="Max 10 images at a time. AI suggests a title and tags; you can edit everything before publishing."
       />
 
       <input
@@ -206,7 +206,7 @@ export default function GalleryUpload() {
           </span>
           <span className="font-display text-[28px] leading-none">{cards.length ? "Add more images" : "Choose images"}</span>
           <span className="text-[14px] text-muted">
-            Or drop them here. JPG, PNG or WEBP, up to 10 MB each. {cards.length ? `${MAX - cards.length} more allowed.` : "Max 5 images at a time."}
+            Or drop them here. JPG, PNG or WEBP, up to 10 MB each. {cards.length ? `${MAX - cards.length} more allowed.` : "Max 10 images at a time."}
           </span>
         </button>
       )}

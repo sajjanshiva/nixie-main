@@ -40,7 +40,7 @@ module.exports = {
 
   // Uploads
   MAX_UPLOAD_MB: 10,
-  MAX_GALLERY_BATCH: 5,
+  MAX_GALLERY_BATCH: 10,
 
   // GST (fixed in code by decision). Prices typed by admin are BEFORE GST.
   GST_SLAB_LIMIT_PAISE: 2500 * 100, // up to ₹2,500 per piece → low rate
