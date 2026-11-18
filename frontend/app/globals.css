@@ -75,6 +75,15 @@ body {
   @media (width >= 48rem) { & > * { margin-bottom: 18px; } }
 }
 
+/* Reviews grid — 1 col mobile, 2 col tablet, 3 col desktop */
+@utility reviews-grid {
+  column-gap: 20px;
+  columns: 1;
+  @media (width >= 40rem) { columns: 2; column-gap: 20px; }
+  @media (width >= 72rem) { columns: 3; column-gap: 24px; }
+  & > * { break-inside: avoid; margin-bottom: 20px; }
+}
+
 /* Analysing scan line */
 @keyframes nx-scan {
   0% { transform: translateY(-10%); }

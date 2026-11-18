@@ -1,41 +1,62 @@
 "use client";
-import { useEffect, useState } from "react";
-import { Star, Play, Quote } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { Star, Play, Quote, ChevronDown, Camera } from "lucide-react";
 import { api } from "@/lib/api";
 
+const INITIAL_COUNT = 6;
+const BATCH_SIZE = 6;
+
+// ─── Stars Row ─────────────────────────────────────────────────────
+function Stars({ count = 5 }) {
+  return (
+    <div className="flex gap-[3px]">
+      {Array.from({ length: Math.min(Math.max(count, 1), 5) }, (_, i) => (
+        <Star key={i} className="size-3.5 fill-[#ffc43a] text-[#ffc43a]" />
+      ))}
+    </div>
+  );
+}
+
+// ─── Main Section ──────────────────────────────────────────────────
 export default function ReviewsMosaic() {
-  const [reviews, setReviews] = useState([]);
+  const [allReviews, setAllReviews] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
   const [loaded, setLoaded] = useState(false);
+  const [expanding, setExpanding] = useState(false);
 
   useEffect(() => {
     let alive = true;
     api("/reviews")
       .then((data) => {
         if (alive) {
-          if (Array.isArray(data?.reviews)) {
-            setReviews(data.reviews);
-          }
+          if (Array.isArray(data?.reviews)) setAllReviews(data.reviews);
           setLoaded(true);
         }
       })
-      .catch(() => {
-        if (alive) setLoaded(true);
-      });
-    return () => {
-      alive = false;
-    };
+      .catch(() => { if (alive) setLoaded(true); });
+    return () => { alive = false; };
   }, []);
 
-  // Do not render section if there are no published reviews yet
-  if (!loaded || reviews.length === 0) {
-    return null;
-  }
+  const handleShowMore = useCallback(() => {
+    setExpanding(true);
+    setTimeout(() => {
+      setVisibleCount((c) => Math.min(c + BATCH_SIZE, allReviews.length));
+      setExpanding(false);
+    }, 150);
+  }, [allReviews.length]);
+
+  if (!loaded || allReviews.length === 0) return null;
+
+  const visible = allReviews.slice(0, visibleCount);
+  const hasMore = visibleCount < allReviews.length;
+  const remaining = allReviews.length - visibleCount;
 
   return (
-    <section className="bg-mint py-10 sm:py-14 lg:py-16 overflow-hidden">
-      <div className="mx-auto max-w-[1320px] px-5 sm:px-8">
-        
-        {/* Section Heading */}
+    <section className="bg-mint py-14 sm:py-20">
+
+      <div className="mx-auto max-w-[1240px] px-4 sm:px-8">
+
+        {/* ── Section Header ── */}
         <div className="text-center mb-10 sm:mb-14">
           <h2 className="font-display text-[40px] leading-[1.05] tracking-tight text-ink sm:text-[52px] lg:text-[60px] font-bold">
             a love story with our clients
@@ -45,107 +66,169 @@ export default function ReviewsMosaic() {
           </p>
         </div>
 
-        {/* Mosaic Masonry Grid */}
-        <div className="masonry">
-          {reviews.map((rev) => (
+        {/* ── Reviews Grid ── */}
+        <div
+          className={`reviews-grid transition-opacity duration-200 ${expanding ? "opacity-50" : "opacity-100"}`}
+        >
+          {visible.map((rev) => (
             <ReviewCard key={rev.id} review={rev} />
           ))}
         </div>
+
+        {/* ── Show More Button ── */}
+        {hasMore && (
+          <div className="mt-10 flex flex-col items-center gap-3">
+            <button
+              onClick={handleShowMore}
+              className="group inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-white border-2 border-teal/30 text-teal-deep font-semibold text-[14.5px] shadow-sm hover:border-teal hover:bg-teal hover:text-white transition-all duration-200 hover:shadow-[0_6px_24px_rgba(39,157,164,0.25)] active:scale-95"
+            >
+              <ChevronDown className="size-4 transition-transform duration-200 group-hover:translate-y-0.5" />
+              Discover More Client Stories
+              <span className="bg-teal/10 group-hover:bg-white/20 text-teal-deeper group-hover:text-white text-[12px] px-2 py-0.5 rounded-full transition-colors duration-200">
+                {remaining} more
+              </span>
+            </button>
+            <p className="text-[12.5px] text-muted">
+              Showing {visibleCount} of {allReviews.length} reviews
+            </p>
+          </div>
+        )}
 
       </div>
     </section>
   );
 }
 
+// ═══════════════════════════════════════════════════════════
+//  REVIEW CARDS
+// ═══════════════════════════════════════════════════════════
+
 function ReviewCard({ review }) {
-  const { type, clientName, clientLocation, outfitName, rating = 5, quote, mediaUrl } = review;
+  const { type, mediaUrl } = review;
+  if (type === "image" && mediaUrl) return <ImageReviewCard review={review} />;
+  if (type === "video" && mediaUrl) return <VideoReviewCard review={review} />;
+  return <TextReviewCard review={review} />;
+}
 
-  // Rating Stars
-  const stars = Array.from({ length: Math.min(Math.max(rating, 1), 5) }, (_, i) => (
-    <Star key={i} className="size-3.5 fill-[#ffc43a] text-[#ffc43a]" />
-  ));
+// ─── Text Review Card ──────────────────────────────────────
+function TextReviewCard({ review }) {
+  const { clientName = "", clientLocation, outfitName, rating = 5, quote } = review;
 
-  if (type === "image" && mediaUrl) {
-    return (
-      <div className="group break-inside-avoid mb-5 overflow-hidden rounded-[20px] bg-white ring-1 ring-line/80 shadow-[0_4px_20px_rgba(13,74,78,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(13,74,78,0.12)]">
-        <div className="relative aspect-[3/4] w-full overflow-hidden bg-mint">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={mediaUrl}
-            alt={outfitName || clientName || "Client review"}
-            className="size-full object-cover transition-transform duration-500 group-hover:scale-103"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-5 text-white">
-            <div className="flex gap-1 mb-2">{stars}</div>
-            <p className="text-[14px] leading-snug font-medium text-white/95 line-clamp-3">
-              “{quote}”
-            </p>
-            <div className="mt-2 flex items-baseline justify-between text-[12.5px] text-white/80">
-              <span className="font-bold text-white">{clientName}</span>
-              {clientLocation && <span>{clientLocation}</span>}
-            </div>
-          </div>
-        </div>
-        {outfitName && (
-          <div className="px-4 py-2.5 bg-white/90 border-t border-line/40 text-[12.5px] font-medium text-teal-deeper">
-            Outfit: {outfitName}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  if (type === "video" && mediaUrl) {
-    return (
-      <div className="group break-inside-avoid mb-5 overflow-hidden rounded-[20px] bg-white ring-1 ring-line/80 shadow-[0_4px_20px_rgba(13,74,78,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(13,74,78,0.12)]">
-        <div className="relative aspect-[3/4] w-full overflow-hidden bg-black">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={mediaUrl}
-            alt={outfitName || clientName || "Client video"}
-            className="size-full object-cover opacity-85 transition-transform duration-500 group-hover:scale-103"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex size-14 items-center justify-center rounded-full bg-cyan/90 text-ink shadow-[0_0_24px_rgba(84,235,235,0.7)] transition-transform duration-300 group-hover:scale-110">
-              <Play className="size-6 fill-ink translate-x-0.5" />
-            </div>
-          </div>
-          <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black/85 via-black/40 to-transparent text-white">
-            <div className="flex gap-1 mb-1.5">{stars}</div>
-            <p className="text-[13.5px] leading-snug line-clamp-2 text-white/90">
-              “{quote}”
-            </p>
-            <div className="mt-2 text-[12.5px] font-semibold text-white">
-              {clientName} {clientLocation ? `• ${clientLocation}` : ""}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Pure Text Review Card
   return (
-    <div className="break-inside-avoid mb-5 rounded-[20px] bg-white p-6 sm:p-7 ring-1 ring-line/80 shadow-[0_4px_20px_rgba(13,74,78,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(13,74,78,0.12)]">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex gap-1">{stars}</div>
-        <Quote className="size-5 text-teal/30" />
+    <div className="group break-inside-avoid mb-5 rounded-2xl bg-white border border-line/80 shadow-[0_2px_16px_rgba(13,74,78,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_32px_rgba(13,74,78,0.1)] hover:border-teal/30 p-5 sm:p-6">
+
+      {/* Stars + quote watermark */}
+      <div className="flex items-start justify-between mb-4">
+        <Stars count={rating} />
+        <Quote className="size-6 text-teal/15 flex-shrink-0 mt-0.5" />
       </div>
-      <p className="text-[15px] sm:text-[16px] leading-relaxed text-ink/90 font-medium italic">
-        “{quote}”
+
+      {/* Quote */}
+      <p className="text-[15px] sm:text-[15.5px] leading-relaxed text-ink/85 font-normal italic">
+        &ldquo;{quote}&rdquo;
       </p>
-      <div className="mt-5 pt-4 border-t border-line/60 flex items-center justify-between text-[13px]">
-        <div>
-          <p className="font-bold text-ink">{clientName}</p>
-          {clientLocation && <p className="text-muted text-[12px]">{clientLocation}</p>}
-        </div>
-        {outfitName && (
-          <span className="text-[12px] font-semibold text-teal-deep bg-cyan-soft px-2.5 py-1 rounded-full">
-            {outfitName}
-          </span>
+
+      {/* Footer */}
+      <div className="mt-5 pt-4 border-t border-line/60">
+        <p className="font-semibold text-ink text-[13.5px]">{clientName}</p>
+        {clientLocation && (
+          <p className="text-muted text-[12px] mt-0.5">{clientLocation}</p>
         )}
+        {outfitName && (
+          <p className="text-teal-deep text-[12px] mt-1 font-medium">{outfitName}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Photo / Image Review Card ─────────────────────────────
+function ImageReviewCard({ review }) {
+  const { clientName = "", clientLocation, outfitName, rating = 5, quote, mediaUrl } = review;
+
+  return (
+    <div className="group break-inside-avoid mb-5 rounded-2xl overflow-hidden bg-white border border-line/80 shadow-[0_2px_16px_rgba(13,74,78,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_32px_rgba(13,74,78,0.1)] hover:border-teal/30">
+
+      {/* Photo */}
+      <div className="relative w-full overflow-hidden bg-mint" style={{ aspectRatio: "3/4" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={mediaUrl}
+          alt={outfitName || clientName || "Client photo"}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          loading="lazy"
+        />
+        {/* Discreet badge */}
+        <div className="absolute top-3 left-3 inline-flex items-center gap-1 bg-black/40 backdrop-blur-sm text-white text-[11px] font-medium px-2.5 py-1 rounded-full">
+          <Camera className="size-3" />
+          Client Photo
+        </div>
+      </div>
+
+      {/* Text panel */}
+      <div className="p-4 sm:p-5">
+        <Stars count={rating} />
+        {quote && (
+          <p className="mt-3 text-[14px] sm:text-[14.5px] leading-relaxed text-ink/85 italic font-normal line-clamp-3">
+            &ldquo;{quote}&rdquo;
+          </p>
+        )}
+        <div className="mt-4 pt-3.5 border-t border-line/60">
+          <p className="font-semibold text-ink text-[13px]">{clientName}</p>
+          {clientLocation && (
+            <p className="text-muted text-[11.5px] mt-0.5">{clientLocation}</p>
+          )}
+          {outfitName && (
+            <p className="text-teal-deep text-[12px] mt-1 font-medium">{outfitName}</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Video Review Card ─────────────────────────────────────
+function VideoReviewCard({ review }) {
+  const { clientName = "", clientLocation, outfitName, rating = 5, quote, mediaUrl } = review;
+
+  return (
+    <div className="group break-inside-avoid mb-5 rounded-2xl overflow-hidden bg-white border border-line/80 shadow-[0_2px_16px_rgba(13,74,78,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_32px_rgba(13,74,78,0.1)] hover:border-teal/30">
+
+      {/* Video thumbnail */}
+      <div className="relative w-full overflow-hidden bg-ink/90" style={{ aspectRatio: "3/4" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={mediaUrl}
+          alt={outfitName || clientName || "Client video"}
+          className="w-full h-full object-cover opacity-80 transition-transform duration-500 group-hover:scale-[1.03]"
+          loading="lazy"
+        />
+        {/* Play button */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex size-[52px] items-center justify-center rounded-full bg-teal-deep shadow-[0_0_0_8px_rgba(29,122,128,0.2)] transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_0_12px_rgba(29,122,128,0.15)]">
+            <Play className="size-5 fill-white text-white translate-x-0.5" />
+          </div>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+      </div>
+
+      {/* Text panel */}
+      <div className="p-4 sm:p-5">
+        <Stars count={rating} />
+        {quote && (
+          <p className="mt-3 text-[14px] sm:text-[14.5px] leading-relaxed text-ink/85 italic font-normal line-clamp-3">
+            &ldquo;{quote}&rdquo;
+          </p>
+        )}
+        <div className="mt-4 pt-3.5 border-t border-line/60">
+          <p className="font-semibold text-ink text-[13px]">{clientName}</p>
+          {clientLocation && (
+            <p className="text-muted text-[11.5px] mt-0.5">{clientLocation}</p>
+          )}
+          {outfitName && (
+            <p className="text-teal-deep text-[12px] mt-1 font-medium">{outfitName}</p>
+          )}
+        </div>
       </div>
     </div>
   );
