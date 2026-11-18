@@ -8,7 +8,13 @@ export const Tabs = TabsPrimitive.Root;
 export function TabsList({ className, ...props }) {
   return (
     <TabsPrimitive.List
-      className={cn("flex gap-1 overflow-x-auto rounded-[8px] bg-surface p-1.5 ring-1 ring-line [scrollbar-width:none]", className)}
+      className={cn(
+        // Base: shared look — the layout (flex vs grid) is controlled by className prop
+        "gap-1 overflow-x-auto rounded-[8px] bg-surface p-1.5 ring-1 ring-line [scrollbar-width:none]",
+        // Default to flex if caller doesn't override
+        "flex",
+        className
+      )}
       {...props}
     />
   );

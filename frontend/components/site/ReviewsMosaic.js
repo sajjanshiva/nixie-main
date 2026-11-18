@@ -1,9 +1,12 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
-import { Star, Play, Quote, ChevronDown, Camera } from "lucide-react";
+import { Star, Play, Quote, Camera } from "lucide-react";
 import { api } from "@/lib/api";
+import Button from "@/components/ui/Button";
 
-const INITIAL_COUNT = 6;
+// Show 5 on mobile, 6 on desktop — detected after mount
+const MOBILE_INITIAL = 5;
+const DESKTOP_INITIAL = 6;
 const BATCH_SIZE = 6;
 
 // ─── Stars Row ─────────────────────────────────────────────────────
@@ -20,9 +23,14 @@ function Stars({ count = 5 }) {
 // ─── Main Section ──────────────────────────────────────────────────
 export default function ReviewsMosaic() {
   const [allReviews, setAllReviews] = useState([]);
-  const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
+  const [visibleCount, setVisibleCount] = useState(DESKTOP_INITIAL);
   const [loaded, setLoaded] = useState(false);
   const [expanding, setExpanding] = useState(false);
+
+  // Set correct initial count based on screen width after mount
+  useEffect(() => {
+    if (window.innerWidth < 640) setVisibleCount(MOBILE_INITIAL);
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -49,7 +57,6 @@ export default function ReviewsMosaic() {
 
   const visible = allReviews.slice(0, visibleCount);
   const hasMore = visibleCount < allReviews.length;
-  const remaining = allReviews.length - visibleCount;
 
   return (
     <section className="bg-mint py-14 sm:py-20">
@@ -77,20 +84,10 @@ export default function ReviewsMosaic() {
 
         {/* ── Show More Button ── */}
         {hasMore && (
-          <div className="mt-10 flex flex-col items-center gap-3">
-            <button
-              onClick={handleShowMore}
-              className="group inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-white border-2 border-teal/30 text-teal-deep font-semibold text-[14.5px] shadow-sm hover:border-teal hover:bg-teal hover:text-white transition-all duration-200 hover:shadow-[0_6px_24px_rgba(39,157,164,0.25)] active:scale-95"
-            >
-              <ChevronDown className="size-4 transition-transform duration-200 group-hover:translate-y-0.5" />
+          <div className="mt-10 flex justify-center">
+            <Button variant="outline" size="lg" onClick={handleShowMore}>
               Discover More Client Stories
-              <span className="bg-teal/10 group-hover:bg-white/20 text-teal-deeper group-hover:text-white text-[12px] px-2 py-0.5 rounded-full transition-colors duration-200">
-                {remaining} more
-              </span>
-            </button>
-            <p className="text-[12.5px] text-muted">
-              Showing {visibleCount} of {allReviews.length} reviews
-            </p>
+            </Button>
           </div>
         )}
 

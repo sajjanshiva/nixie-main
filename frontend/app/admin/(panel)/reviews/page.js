@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Star,
   Plus,
@@ -14,39 +14,70 @@ import {
   Upload,
   CheckCircle2,
 } from "lucide-react";
-import { PageHeader, Card, FilterChips, SearchBox, ConfirmDialog } from "@/components/admin/ui";
+import { PageHeader, Card, FilterChips, SearchBox, ConfirmDialog, LoadMore } from "@/components/admin/ui";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/cn";
 
+const PAGE_SIZE = 18;
+const EMPTY_STATS = { total: 0, active: 0, photos: 0, videos: 0 };
+
 export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState([]);
+  const [stats, setStats] = useState(EMPTY_STATS);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingReview, setEditingReview] = useState(null);
   const [deletingReview, setDeletingReview] = useState(null);
   const [busyDelete, setBusyDelete] = useState(false);
+  const reqId = useRef(0);
 
-  // Load reviews on mount
-  async function loadReviews() {
-    setLoading(true);
-    try {
-      const res = await api("/admin/reviews");
-      setReviews(Array.isArray(res?.reviews) ? res.reviews : []);
-    } catch (err) {
-      console.error("Failed to load reviews:", err);
-    } finally {
-      setLoading(false);
-    }
-  }
+  // Load one page (18) from the server. Page 1 replaces the list, later pages are added to it.
+  const loadPage = useCallback(
+    async (p) => {
+      const id = ++reqId.current;
+      if (p === 1) setLoading(true);
+      else setLoadingMore(true);
+      try {
+        const qs = new URLSearchParams({ page: String(p), limit: String(PAGE_SIZE) });
+        if (filter !== "all") qs.set("status", filter);
+        if (search) qs.set("q", search);
+        const res = await api(`/admin/reviews?${qs}`);
+        if (id !== reqId.current) return;
+        const list = Array.isArray(res?.reviews) ? res.reviews : [];
+        setReviews((prev) => {
+          if (p === 1) return list;
+          const seen = new Set(prev.map((r) => r.id));
+          return [...prev, ...list.filter((r) => !seen.has(r.id))];
+        });
+        setHasMore(Boolean(res?.hasMore));
+        setStats(res?.stats || EMPTY_STATS);
+        setPage(p);
+      } catch (err) {
+        if (id === reqId.current) console.error("Failed to load reviews:", err);
+      } finally {
+        if (id === reqId.current) {
+          setLoading(false);
+          setLoadingMore(false);
+        }
+      }
+    },
+    [filter, search]
+  );
 
+  const loadReviews = useCallback(() => loadPage(1), [loadPage]);
+
+  // Reload from page 1 whenever the filter or search changes
   useEffect(() => {
     loadReviews();
-  }, []);
+  }, [loadReviews]);
 
   // Quick toggle active / hidden
   async function toggleActive(review) {
@@ -55,6 +86,7 @@ export default function AdminReviewsPage() {
       setReviews((prev) =>
         prev.map((r) => (r.id === review.id ? { ...r, isActive: updatedStatus } : r))
       );
+      setStats((s) => ({ ...s, active: s.active + (updatedStatus ? 1 : -1) }));
       await api(`/admin/reviews/${review.id}`, {
         method: "PATCH",
         body: { isActive: updatedStatus },
@@ -68,10 +100,17 @@ export default function AdminReviewsPage() {
   // Delete review
   async function confirmDelete() {
     if (!deletingReview) return;
+    const removed = deletingReview;
     setBusyDelete(true);
     try {
-      await api(`/admin/reviews/${deletingReview.id}`, { method: "DELETE" });
-      setReviews((prev) => prev.filter((r) => r.id !== deletingReview.id));
+      await api(`/admin/reviews/${removed.id}`, { method: "DELETE" });
+      setReviews((prev) => prev.filter((r) => r.id !== removed.id));
+      setStats((s) => ({
+        total: s.total - 1,
+        active: s.active - (removed.isActive ? 1 : 0),
+        photos: s.photos - (removed.type === "image" ? 1 : 0),
+        videos: s.videos - (removed.type === "video" ? 1 : 0),
+      }));
       setDeletingReview(null);
     } catch (err) {
       alert("Failed to delete review: " + (err.message || "Unknown error"));
@@ -79,34 +118,6 @@ export default function AdminReviewsPage() {
       setBusyDelete(false);
     }
   }
-
-  // Filtered & searched reviews
-  const filteredReviews = useMemo(() => {
-    return reviews.filter((r) => {
-      if (filter === "active" && !r.isActive) return false;
-      if (filter === "hidden" && r.isActive) return false;
-
-      if (search) {
-        const q = search.toLowerCase();
-        const client = (r.clientName || "").toLowerCase();
-        const loc = (r.clientLocation || "").toLowerCase();
-        const outfit = (r.outfitName || "").toLowerCase();
-        const quote = (r.quote || "").toLowerCase();
-        if (!client.includes(q) && !loc.includes(q) && !outfit.includes(q) && !quote.includes(q)) {
-          return false;
-        }
-      }
-      return true;
-    });
-  }, [reviews, filter, search]);
-
-  const stats = useMemo(() => {
-    const total = reviews.length;
-    const active = reviews.filter((r) => r.isActive).length;
-    const photos = reviews.filter((r) => r.type === "image").length;
-    const videos = reviews.filter((r) => r.type === "video").length;
-    return { total, active, photos, videos };
-  }, [reviews]);
 
   return (
     <div>
@@ -174,7 +185,7 @@ export default function AdminReviewsPage() {
             <Card key={i} className="h-64 animate-pulse bg-surface/50" />
           ))}
         </div>
-      ) : filteredReviews.length === 0 ? (
+      ) : reviews.length === 0 ? (
         <Card className="flex flex-col items-center justify-center p-12 text-center">
           <div className="flex size-14 items-center justify-center rounded-full bg-cyan-soft text-teal-deep mb-4">
             <Star className="size-7" />
@@ -198,8 +209,9 @@ export default function AdminReviewsPage() {
           </Button>
         </Card>
       ) : (
+        <>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredReviews.map((review) => (
+          {reviews.map((review) => (
             <AdminReviewCard
               key={review.id}
               review={review}
@@ -212,6 +224,8 @@ export default function AdminReviewsPage() {
             />
           ))}
         </div>
+        <LoadMore hasMore={hasMore} loading={loadingMore} onClick={() => loadPage(page + 1)} />
+        </>
       )}
 
       {/* Create / Edit Dialog */}

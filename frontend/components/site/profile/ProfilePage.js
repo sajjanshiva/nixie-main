@@ -51,10 +51,29 @@ export default function ProfilePage() {
       <p className="mt-3 text-[16px] text-muted">{customer.email}</p>
 
       <Tabs value={tab} onValueChange={(v) => router.replace(`${pathname}?tab=${v}`, { scroll: false })} className="mt-8">
-        <TabsList aria-label="Profile sections" className="max-w-full sm:inline-flex">
+        {/* Mobile: 2×2 individual cards. Desktop: original horizontal pill bar */}
+        <TabsList
+          aria-label="Profile sections"
+          className="bg-transparent p-0 ring-0 grid grid-cols-2 gap-2 w-full sm:bg-surface sm:p-1.5 sm:ring-1 sm:ring-line sm:inline-flex sm:gap-1 sm:w-auto sm:overflow-x-auto sm:rounded-[8px]"
+        >
           {TABS.map((t) => (
-            <TabsTrigger key={t.id} value={t.id}>
-              <t.icon className="size-4" aria-hidden="true" />
+            <TabsTrigger
+              key={t.id}
+              value={t.id}
+              className={[
+                // Mobile card style
+                "flex-col gap-1.5 h-auto min-h-[72px] w-full rounded-[10px] py-3.5 px-3",
+                "bg-white border border-line/80 text-[13px] font-semibold text-muted",
+                "hover:border-teal/50 hover:text-teal-deep hover:bg-teal/[0.03]",
+                "data-[state=active]:bg-ink data-[state=active]:text-white data-[state=active]:border-ink data-[state=active]:shadow-sm",
+                // Desktop — restore original look
+                "sm:flex-row sm:h-10 sm:min-h-0 sm:w-auto sm:rounded-[6px] sm:py-0 sm:px-4 sm:gap-2",
+                "sm:border-0 sm:bg-transparent sm:text-[14.5px]",
+                "sm:hover:border-0 sm:hover:bg-transparent",
+                "sm:data-[state=active]:bg-ink sm:data-[state=active]:border-0 sm:data-[state=active]:shadow-none",
+              ].join(" ")}
+            >
+              <t.icon className="size-5 sm:size-4" aria-hidden="true" />
               {t.label}
             </TabsTrigger>
           ))}
