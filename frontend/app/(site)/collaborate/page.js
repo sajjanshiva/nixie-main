@@ -93,7 +93,7 @@ export default function CollaboratePage() {
                 <strong className="text-ink">Truly Bespoke:</strong> We don&apos;t just send off-the-rack inventory. Every piece is drafted from scratch, tailored to your exact measurements, chosen neckline, preferred color, and silhouette.
               </p>
               <p>
-                <strong className="text-ink">In-House Quality Control:</strong> Everything happens under one roof in our Nagpur studio — from pattern cutting to hand finishing and thread checks.
+                <strong className="text-ink">In-House Quality Control:</strong> Everything happens under one roof in our Bangalore studio — from pattern cutting to hand finishing and thread checks.
               </p>
               <p>
                 <strong className="text-ink">Conscious Fashion:</strong> We believe in thoughtful design that lasts beyond fleeting trends, supporting zero-waste craftsmanship.

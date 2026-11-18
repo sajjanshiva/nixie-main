@@ -259,3 +259,23 @@ CREATE TABLE payments (
 );
 CREATE INDEX payments_invoice_idx ON payments (invoice_id, created_at DESC);
 CREATE INDEX payments_paid_idx    ON payments (status, paid_at DESC);
+
+-- ---------------------------------------------------------------------
+-- Reviews (client text, photo, and video reviews shown in the website mosaic)
+-- ---------------------------------------------------------------------
+CREATE TABLE reviews (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  type            text NOT NULL DEFAULT 'text' CHECK (type IN ('text', 'image', 'video')),
+  client_name     text NOT NULL,
+  client_location text,
+  outfit_name     text,
+  rating          integer NOT NULL DEFAULT 5 CHECK (rating >= 1 AND rating <= 5),
+  quote           text NOT NULL,
+  media_url       text,
+  media_file_id   text,
+  aspect_ratio    text NOT NULL DEFAULT 'square' CHECK (aspect_ratio IN ('square', 'tall', 'wide')),
+  is_active       boolean NOT NULL DEFAULT true,
+  created_at      timestamptz NOT NULL DEFAULT now(),
+  updated_at      timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX reviews_active_idx ON reviews (is_active, created_at DESC);

@@ -24,7 +24,7 @@ export async function api(path, { method = "GET", body, signal } = {}) {
       method,
       credentials: "include",
       headers: body && !isForm ? { "Content-Type": "application/json" } : undefined,
-      body: body ? (isForm ? body : JSON.stringify(body)) : undefined,
+      body: body ? (isForm ? body : typeof body === "string" ? body : JSON.stringify(body)) : undefined,
       signal,
       cache: "no-store",
     });

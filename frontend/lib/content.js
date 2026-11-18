@@ -3,7 +3,7 @@
 
 export const HERO = {
   title: "Found a look you can’t stop thinking about?",
-  subtitle: "Upload a photo of it. We’ll tell you what it costs to have Nixie make it for you.",
+  subtitle: "Upload it here, we’ll tell you what it’ll cost in seconds!",
 };
 
 export const HOW_IT_WORKS = {
@@ -55,7 +55,7 @@ export const FAQS = [
     q: "What if I don’t like the outfit after it’s made?",
     a: "Your outfit is crafted with close attention to your inspiration, measurements and the approvals you share with us along the way. If you need minor adjustments for fit, we are happy to help. Since each piece is made specially for you, full cancellations or remakes are not possible, but we always work with you to make sure the final look feels right and comfortable.",
   },
-  { q: "Where are you located?", a: "Our production is set up in Nagpur, Maharashtra. We deliver across India." },
+  { q: "Where are you located?", a: "Our studio is located in Bangalore, Karnataka. We craft every custom outfit in-house and deliver across India." },
   {
     q: "What if the delivery takes longer than expected?",
     a: "We will keep you informed and share a revised timeline. Delays are rare, but we communicate everything clearly.",

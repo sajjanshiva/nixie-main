@@ -10,7 +10,7 @@ const imagekit = new ImageKit({
   urlEndpoint: env.IMAGEKIT_URL_ENDPOINT,
 });
 
-const FOLDERS = new Set(["analyses", "enquiries", "gallery"]);
+const FOLDERS = new Set(["analyses", "enquiries", "gallery", "reviews"]);
 
 async function uploadImage(buffer, folder, ext = "webp") {
   if (!FOLDERS.has(folder)) throw new Error(`Unknown ImageKit folder: ${folder}`);

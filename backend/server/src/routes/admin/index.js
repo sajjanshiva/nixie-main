@@ -17,5 +17,6 @@ router.use("/dashboard", require("./dashboard"));
 router.use("/leads", require("./leads"));
 router.use("/invoices", require("./invoices"));
 router.use("/gallery", require("./gallery"));
+router.use("/reviews", require("./reviews"));
 
 module.exports = router;

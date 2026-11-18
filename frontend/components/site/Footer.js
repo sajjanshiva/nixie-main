@@ -3,69 +3,107 @@ import Link from "next/link";
 import { Mail } from "lucide-react";
 import Logo from "@/components/ui/Logo";
 import InstagramIcon from "@/components/ui/InstagramIcon";
-import { useMeta } from "@/components/providers/MetaProvider";
-import { FOOTER_LINKS, TAGLINE } from "@/lib/content";
+
+const QUICK_LINKS = [
+  { href: "/about-nixie", label: "About Nixie" },
+  { href: "/collaborate", label: "Collaborate with Nixie" },
+  { href: "/#faqs", label: "FAQs" },
+  { href: "/shipping", label: "Shipping & Delivery" },
+  { href: "/terms-of-service", label: "Terms of Service" },
+  { href: "/refund-policy", label: "Returns & Cancellations" },
+  { href: "/privacy-policy", label: "Privacy Policy" },
+  { href: "/contact", label: "Contact Us" },
+];
 
 export default function Footer() {
-  const { meta } = useMeta();
   return (
-    <footer className="relative overflow-hidden bg-ink text-white">
-      <div className="mx-auto grid max-w-[1320px] gap-12 px-5 pb-10 pt-16 sm:px-8 lg:grid-cols-[1.1fr_1.4fr] lg:pt-20">
-        <div className="flex flex-col gap-6">
+    <footer className="relative bg-mint text-ink border-t border-line/60">
+      <div className="mx-auto grid max-w-[1320px] gap-10 px-5 pt-10 pb-6 sm:px-8 sm:pt-12 lg:grid-cols-12">
+        
+        {/* Brand Column */}
+        <div className="flex flex-col gap-5 lg:col-span-5">
           <Link href="/" aria-label="Nixie home" className="self-start">
-            <Logo tone="white" className="h-8 w-auto" />
+            <Logo className="h-7 w-auto" />
           </Link>
-          <p className="font-display max-w-sm text-[34px] leading-[1.05] text-white sm:text-[40px]">{TAGLINE}</p>
-          <div className="flex flex-wrap gap-3 pt-2">
+          <p className="max-w-md text-[15.5px] leading-relaxed text-muted">
+            Bespoke tailoring crafted from your favorite references. We recreate high-fashion looks to your personal size, comfort, and fabric choices with master tailors in our studio.
+          </p>
+          
+          {/* Social Links */}
+          <div className="flex flex-wrap items-center gap-3 pt-2">
             <a
-              href={meta.instagramUrl}
+              href="https://instagram.com/thenixie.in"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-[6px] bg-white/10 px-4 py-2.5 text-[14.5px] font-medium text-white ring-1 ring-white/15 transition-all duration-200 hover:bg-cyan hover:text-ink hover:ring-cyan"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-[13.5px] font-semibold text-ink ring-1 ring-line hover:bg-cyan-soft hover:text-teal-deeper transition-all duration-200"
             >
-              <InstagramIcon className="size-[18px]" />
-              @thenixie.in
+              <InstagramIcon className="size-4" />
+              Instagram
             </a>
-            {meta.contactEmail && (
-              <a
-                href={`mailto:${meta.contactEmail}`}
-                className="inline-flex items-center gap-2 rounded-[6px] bg-white/10 px-4 py-2.5 text-[14.5px] font-medium text-white ring-1 ring-white/15 transition-all duration-200 hover:bg-cyan hover:text-ink hover:ring-cyan"
-              >
-                <Mail className="size-[18px]" aria-hidden="true" />
-                {meta.contactEmail}
-              </a>
-            )}
+            <a
+              href="https://in.pinterest.com/nixieofficial/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-[13.5px] font-semibold text-ink ring-1 ring-line hover:bg-cyan-soft hover:text-teal-deeper transition-all duration-200"
+            >
+              Pinterest
+            </a>
+            <a
+              href="https://www.linkedin.com/company/nixieofficial/home/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-[13.5px] font-semibold text-ink ring-1 ring-line hover:bg-cyan-soft hover:text-teal-deeper transition-all duration-200"
+            >
+              LinkedIn
+            </a>
           </div>
         </div>
 
-        <div>
-          <h2 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-cyan">Quick links</h2>
-          <ul className="mt-5 grid grid-cols-2 gap-x-8 gap-y-3.5 sm:grid-cols-3">
-            {FOOTER_LINKS.map((item) => (
+        {/* Quick Links Column */}
+        <div className="lg:col-span-4">
+          <h2 className="text-[13px] font-bold uppercase tracking-[0.08em] text-teal-deep">Quick links</h2>
+          <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3">
+            {QUICK_LINKS.map((item) => (
               <li key={item.label} className="text-[14.5px]">
-                {item.href ? (
-                  <Link
-                    href={item.href}
-                    className="text-white/80 transition-colors duration-150 hover:text-cyan"
-                  >
-                    {item.label}
-                  </Link>
-                ) : (
-                  <span className="text-white/40 cursor-default select-none">
-                    {item.label}
-                  </span>
-                )}
+                <Link
+                  href={item.href}
+                  className="text-ink/80 transition-colors duration-150 hover:text-teal-deep hover:font-medium"
+                >
+                  {item.label}
+                </Link>
               </li>
             ))}
           </ul>
         </div>
+
+        {/* Contact Column */}
+        <div className="lg:col-span-3 flex flex-col gap-3">
+          <h2 className="text-[13px] font-bold uppercase tracking-[0.08em] text-teal-deep">Contact</h2>
+          <a
+            href="mailto:aishwarya@thenixie.in"
+            className="inline-flex items-center gap-2 text-[15px] font-medium text-ink hover:text-teal-deep transition-colors"
+          >
+            <Mail className="size-4 text-teal-deep" aria-hidden="true" />
+            aishwarya@thenixie.in
+          </a>
+          <Link
+            href="/contact"
+            className="text-[14px] text-muted hover:text-ink transition-colors underline underline-offset-4"
+          >
+            Send us a message & custom inquiry
+          </Link>
+        </div>
+
       </div>
 
+      {/* Bottom Bar */}
       <div className="mx-auto max-w-[1320px] px-5 sm:px-8">
-        <div className="border-t border-white/10" aria-hidden="true" />
-        <div className="flex flex-col gap-2 py-6 text-[13px] text-white/60 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Nixie. Made in Nagpur, delivered across India.</p>
-          <p>Every outfit made from scratch, in-house.</p>
+        <div className="border-t border-line/70" aria-hidden="true" />
+        <div className="flex flex-col gap-1.5 py-4 text-[13px] text-muted sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} Nixie. All rights reserved.</p>
+          <p className="font-semibold text-ink">
+            Made to order in Bangalore, delivered across India.
+          </p>
         </div>
       </div>
     </footer>

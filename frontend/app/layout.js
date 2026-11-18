@@ -1,11 +1,11 @@
-import { Cormorant_Garamond } from "next/font/google";
+import { Caveat } from "next/font/google";
 import Providers from "@/components/providers/Providers";
 import "./globals.css";
 
-const headingFont = Cormorant_Garamond({
+const caveatFont = Caveat({
   subsets: ["latin"],
-  variable: "--font-heading",
-  weight: ["400", "500", "600", "700"],
+  variable: "--font-hand",
+  weight: ["400", "600", "700"],
   display: "swap",
 });
 
@@ -24,15 +24,15 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: "#f0fffe",
+  themeColor: "#fffcf0",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en-IN" className={headingFont.variable} suppressHydrationWarning>
-      <body className="min-h-dvh" suppressHydrationWarning>
+    <html lang="en-IN" className={caveatFont.variable} suppressHydrationWarning>
+      <body className="min-h-dvh bg-mint text-ink font-sans" suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -10,6 +10,7 @@ import { ImagePlus, Lock, RotateCcw } from "lucide-react";
 import heroDesktop from "@/public/brand/hero-desktop.jpg";
 import heroMobile from "@/public/brand/hero-mobile.jpg";
 import Button from "@/components/ui/Button";
+import MeasuringTape from "@/components/ui/MeasuringTape";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { api } from "@/lib/api";
 import { checkImageFile, compressImage } from "@/lib/compress";
@@ -156,18 +157,12 @@ export default function AnalysisHero() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease, delay: 0.3 }}
-            className="flex w-full flex-col items-center gap-3 md:items-start"
+            className="w-full max-w-[460px]"
           >
-            <Button size="lg" onClick={openPicker} className="w-full max-w-sm md:w-auto">
+            <Button size="lg" onClick={openPicker} className="w-full sm:w-auto min-w-[220px]">
               <ImagePlus className="size-5" aria-hidden="true" />
-              Upload your outfit
+              Instant price check
             </Button>
-            {remainingText && (
-              <p className="inline-flex items-center gap-2 text-[13.5px] font-semibold text-ink">
-                <span className="size-2 rounded-[2px] bg-yellow" aria-hidden="true" />
-                {remainingText}
-              </p>
-            )}
           </motion.div>
 
           <AnimatePresence>
@@ -236,11 +231,13 @@ export default function AnalysisHero() {
             )}
           </AnimatePresence>
         </div>
+
+        {/* Desktop photo panel with 6px solid teal border matching prototype */}
         <motion.div
           initial={{ opacity: 0, scale: 1.04 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.1, ease }}
-          className="relative w-1/2 overflow-hidden"
+          className="relative w-1/2 overflow-hidden border-l-[6px] border-[#279da4]"
         >
           <Image
             src={heroDesktop}
@@ -249,10 +246,11 @@ export default function AnalysisHero() {
             quality={95}
             fill
             sizes="50vw"
-            className="object-cover object-right-top"
+            className="object-cover object-center"
           />
         </motion.div>
       </div>
+      <MeasuringTape />
     </section>
   );
 }

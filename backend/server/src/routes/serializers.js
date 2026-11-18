@@ -210,6 +210,22 @@ function publicInvoice(inv, items = []) {
   };
 }
 
+function review(r) {
+  return {
+    id: r.id,
+    type: r.type, // 'text' | 'image' | 'video'
+    clientName: r.client_name,
+    clientLocation: r.client_location || null,
+    outfitName: r.outfit_name || null,
+    rating: r.rating || 5,
+    quote: r.quote || "",
+    mediaUrl: r.media_url || null,
+    aspectRatio: r.aspect_ratio || "square",
+    isActive: r.is_active !== false,
+    createdAt: r.created_at,
+  };
+}
+
 module.exports = {
   publicCustomer,
   analysis,
@@ -218,4 +234,5 @@ module.exports = {
   adminInvoice,
   adminInvoiceRow,
   publicInvoice,
+  review,
 };

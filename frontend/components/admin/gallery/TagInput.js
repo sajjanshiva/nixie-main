@@ -20,7 +20,8 @@ export default function TagInput({ value = [], onChange, id, invalid, placeholde
   }
 
   return (
-    <div
+    <>
+      <div
       className={cn(
         "flex min-h-12 flex-wrap items-center gap-1.5 rounded-[14px] bg-surface px-2.5 py-2 ring-1 ring-inset focus-within:ring-2 focus-within:ring-teal-deep",
         invalid ? "ring-danger" : "ring-line-strong"
@@ -60,5 +61,41 @@ export default function TagInput({ value = [], onChange, id, invalid, placeholde
         className="h-8 min-w-[120px] flex-1 bg-transparent px-1.5 text-[15px] outline-none placeholder:text-[#8aa0a1]"
       />
     </div>
+    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+      <span className="text-[12px] font-medium text-muted mr-1">Categories:</span>
+      {[
+        { label: "Bollywood", value: "bollywood" },
+        { label: "Party/Concert", value: "party/concert" },
+        { label: "Wedding Guest", value: "wedding guest" },
+        { label: "Sarees", value: "sarees" },
+        { label: "Festive", value: "festive" },
+        { label: "Gothic", value: "gothic" },
+      ].map((cat) => {
+        const isSelected = value.includes(cat.value);
+        return (
+          <button
+            key={cat.value}
+            type="button"
+            onClick={() => {
+              if (isSelected) {
+                onChange(value.filter((x) => x !== cat.value));
+              } else if (value.length < 20) {
+                onChange([...value, cat.value]);
+              }
+            }}
+            className={cn(
+              "inline-flex items-center px-2.5 py-1 text-[12px] font-medium rounded-full border transition-colors",
+              isSelected
+                ? "bg-teal text-white border-teal shadow-xs"
+                : "bg-surface text-ink/70 border-line hover:border-teal/50 hover:text-ink"
+            )}
+          >
+            {isSelected ? "✓ " : "+ "}
+            {cat.label}
+          </button>
+        );
+      })}
+    </div>
+  </>
   );
 }

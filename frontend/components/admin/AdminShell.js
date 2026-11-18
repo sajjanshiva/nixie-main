@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ExternalLink, FileText, Images, Inbox, LayoutGrid, LogOut, Menu, X } from "lucide-react";
+import { ExternalLink, FileText, Images, Inbox, LayoutGrid, LogOut, Menu, Star, X } from "lucide-react";
 import Logo from "@/components/ui/Logo";
 import Skeleton from "@/components/ui/Skeleton";
 import { Dialog, DialogClose, SheetContent } from "@/components/ui/Dialog";
@@ -16,6 +16,7 @@ const NAV = [
   { href: "/admin/leads", label: "Leads", icon: Inbox },
   { href: "/admin/invoices", label: "Invoices", icon: FileText },
   { href: "/admin/gallery", label: "Gallery", icon: Images },
+  { href: "/admin/reviews", label: "Reviews", icon: Star },
 ];
 
 export default function AdminShell({ children }) {
@@ -51,14 +52,14 @@ export default function AdminShell({ children }) {
   }
 
   return (
-    <div className="min-h-dvh bg-mint lg:grid lg:grid-cols-[248px_1fr]">
+    <div className="min-h-dvh bg-mint lg:grid lg:grid-cols-[256px_1fr]">
       {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-dvh flex-col bg-admin-side px-4 py-6 lg:flex">
+      <aside className="sticky top-0 hidden h-dvh flex-col bg-admin-side px-4 py-6 lg:flex border-r border-black/10">
         <SidebarContent pathname={pathname} />
       </aside>
 
       {/* Phone top bar */}
-      <header className="sticky top-0 z-40 flex h-16 items-center justify-between bg-admin-side px-4 lg:hidden">
+      <header className="sticky top-0 z-40 flex h-16 items-center justify-between bg-admin-side px-4 lg:hidden border-b border-black/10">
         <Link href="/admin" aria-label="Admin dashboard">
           <Logo tone="white" className="h-5 w-auto" />
         </Link>
@@ -84,7 +85,7 @@ export default function AdminShell({ children }) {
       </header>
 
       <main id="main" className="min-w-0 px-4 pb-16 pt-6 sm:px-6 lg:px-10 lg:pt-9">
-        <div className="mx-auto max-w-[1240px]">{children}</div>
+        <div className="mx-auto max-w-[1280px]">{children}</div>
       </main>
     </div>
   );
@@ -106,7 +107,7 @@ function SidebarContent({ pathname }) {
       <Link href="/admin" className="mb-8 ml-2.5 mt-1 self-start" aria-label="Admin dashboard">
         <Logo tone="white" className="h-5 w-auto" />
       </Link>
-      <nav aria-label="Admin" className="flex flex-col gap-1">
+      <nav aria-label="Admin" className="flex flex-col gap-1.5">
         {NAV.map((n) => {
           const active = n.exact ? pathname === n.href : pathname.startsWith(n.href);
           return (
@@ -115,32 +116,34 @@ function SidebarContent({ pathname }) {
               href={n.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] transition-colors",
-                active ? "bg-admin-side-active font-semibold text-admin-side-active-text" : "text-admin-side-text hover:bg-admin-side-hover"
+                "flex items-center gap-3 rounded-[12px] px-3.5 py-2.5 text-[14.5px] transition-all duration-150",
+                active
+                  ? "bg-cyan text-ink font-bold shadow-xs"
+                  : "text-white/80 hover:bg-white/10 hover:text-white"
               )}
             >
-              <n.icon className="size-[18px]" aria-hidden="true" />
+              <n.icon className={cn("size-[18px]", active ? "text-ink" : "text-white/70")} aria-hidden="true" />
               {n.label}
             </Link>
           );
         })}
       </nav>
-      <div className="mt-auto border-t border-admin-side-line px-2.5 pt-4">
+      <div className="mt-auto border-t border-white/15 px-2.5 pt-4">
         <a
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="mb-4 inline-flex items-center gap-2 text-[14px] text-admin-side-text hover:text-white"
+          className="mb-4 inline-flex items-center gap-2 text-[13.5px] font-medium text-white/75 hover:text-white transition-colors"
         >
           <ExternalLink className="size-4" aria-hidden="true" />
-          View website
+          View live website
         </a>
-        <p className="truncate text-[13px] text-admin-side-muted">{admin?.email}</p>
+        <p className="truncate text-[12.5px] text-white/60">{admin?.email}</p>
         <button
           type="button"
           onClick={onLogout}
           disabled={leaving}
-          className="mt-2 inline-flex items-center gap-2 text-[14px] font-semibold text-admin-side-text hover:text-white disabled:opacity-60"
+          className="mt-2.5 inline-flex items-center gap-2 text-[13.5px] font-semibold text-white/80 hover:text-white disabled:opacity-60 transition-colors"
         >
           <LogOut className="size-4" aria-hidden="true" />
           Log out

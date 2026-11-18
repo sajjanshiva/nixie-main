@@ -35,19 +35,33 @@ body {
 /* ---------- Type helpers ---------- */
 @utility font-display {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  letter-spacing: -0.025em;
 }
 
-/* Clean architectural hairline dividers (no dashed stitch lines) */
+@utility font-hand {
+  font-family: var(--font-hand), "Caveat", cursive;
+}
+
+/* Atelier sewing stitch dividers & button trims
+   Scoped to [data-layout="site"] to prevent bleed into admin pages */
+.btn-stitch {
+  display: none;
+}
+[data-layout="site"] .btn-stitch {
+  display: block;
+}
+
+[data-layout="site"] .stitched-btn {
+  position: relative;
+}
+
 @utility stitch-x {
-  background-color: currentColor;
-  opacity: 0.18;
+  border-bottom: 1.5px dashed rgba(0, 0, 0, 0.15);
   height: 1px;
 }
 @utility stitch-y {
-  background-color: currentColor;
-  opacity: 0.18;
+  border-right: 1.5px dashed rgba(0, 0, 0, 0.15);
   width: 1px;
 }
 

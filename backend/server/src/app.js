@@ -63,6 +63,7 @@ app.use("/api/me", require("./routes/me"));
 app.use("/api/analyses", require("./routes/analyses"));
 app.use("/api/leads", require("./routes/leads"));
 app.use("/api/gallery", require("./routes/gallery"));
+app.use("/api/reviews", require("./routes/reviews"));
 app.use("/api/pay", require("./routes/pay"));
 
 app.use(notFoundHandler);

@@ -2,7 +2,7 @@ import AnalysisHero from "@/components/site/AnalysisHero";
 import HowItWorks from "@/components/site/HowItWorks";
 import GalleryPreview from "@/components/site/GalleryPreview";
 import Faq from "@/components/site/Faq";
-import CtaBand from "@/components/site/CtaBand";
+import ReviewsMosaic from "@/components/site/ReviewsMosaic";
 import { serverGet } from "@/lib/serverApi";
 
 export const revalidate = 60; // refresh the gallery preview every minute
@@ -16,7 +16,7 @@ export default async function HomePage() {
       <HowItWorks />
       <GalleryPreview images={images} />
       <Faq />
-      <CtaBand />
+      <ReviewsMosaic />
     </>
   );
 }

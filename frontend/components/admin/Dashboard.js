@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ImageUp, Inbox, Plus, Receipt } from "lucide-react";
+import { ImageUp, Inbox, Plus, Receipt, Star } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Skeleton from "@/components/ui/Skeleton";
 import FormError from "@/components/ui/FormError";
@@ -35,6 +35,10 @@ export default function Dashboard() {
         subtitle="Here’s what’s happening at Nixie."
         actions={
           <>
+            <Button href="/admin/reviews" variant="outline">
+              <Star className="size-[18px]" aria-hidden="true" />
+              Client reviews
+            </Button>
             <Button href="/admin/gallery/upload" variant="outline">
               <ImageUp className="size-[18px]" aria-hidden="true" />
               Upload to gallery

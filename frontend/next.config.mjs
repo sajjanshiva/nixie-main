@@ -12,7 +12,7 @@ const csp = [
   // Next.js needs inline scripts. Google sign-in + Cashfree load their own scripts.
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://accounts.google.com/gsi/client https://sdk.cashfree.com`,
   "style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style",
-  `img-src 'self' data: blob: https://${IMAGE_HOST} https://ik.imagekit.io https://*.googleusercontent.com`,
+  `img-src 'self' data: blob: https://${IMAGE_HOST} https://ik.imagekit.io https://*.googleusercontent.com https://images.unsplash.com`,
   "font-src 'self'",
   "connect-src 'self' https://accounts.google.com/gsi/ https://sdk.cashfree.com https://*.cashfree.com",
   "frame-src https://accounts.google.com/gsi/ https://sdk.cashfree.com https://*.cashfree.com",
@@ -42,6 +42,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "ik.imagekit.io" },
       { protocol: "https", hostname: IMAGE_HOST },
+      { protocol: "https", hostname: "images.unsplash.com" },
     ],
   },
   experimental: {

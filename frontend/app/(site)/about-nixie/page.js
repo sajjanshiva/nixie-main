@@ -5,7 +5,7 @@ import Button from "@/components/ui/Button";
 export const metadata = {
   title: "About Nixie — Custom outfits, made from your inspiration",
   description:
-    "How Nixie started, what we believe, and how our all-women studio in Nagpur crafts custom outfits tailored to your comfort and body.",
+    "How Nixie started, what we believe, and how our studio in Bangalore crafts custom outfits tailored to your comfort and body.",
 };
 
 export default function AboutPage() {
@@ -86,7 +86,7 @@ export default function AboutPage() {
               What started as a small idea grew into a custom fashion space run by an <strong className="text-ink">all-women team</strong> that loves clothes, loves details, and loves making people feel good in what they wear! That is the heart of Nixie.
             </p>
             <p className="mt-3 text-[16px] leading-relaxed text-muted sm:text-[17px]">
-              Every outfit, moodboard, and stitch happens right inside our studio in Nagpur, Maharashtra, and we deliver custom creations to doorsteps across India.
+              Every outfit, moodboard, and stitch happens right inside our studio in Bangalore, Karnataka, and we deliver custom creations to doorsteps across India.
             </p>
             <div className="mt-6">
               <Button href="/careers" variant="outline" size="md">

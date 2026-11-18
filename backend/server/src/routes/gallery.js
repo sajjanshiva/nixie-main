@@ -22,6 +22,10 @@ const escapeLike = (s) => s.replace(/[\\%_]/g, "\\$&");
  * Exact/close matches come first, then newest.
  */
 async function searchGallery({ q, tag, limit, offset }) {
+  // If tag is 'latest', treat as all items ordered by newest
+  const isLatest = tag === "latest";
+  const effectiveTag = isLatest ? null : tag;
+
   const { rows } = await query(
     `SELECT ${LIST_COLUMNS},
             CASE WHEN $1::text IS NULL THEN 0 ELSE word_similarity($1::text, search_text) END AS score
@@ -32,7 +36,7 @@ async function searchGallery({ q, tag, limit, offset }) {
              OR word_similarity($1::text, search_text) >= 0.35)
       ORDER BY score DESC, created_at DESC, id DESC
       LIMIT $4 OFFSET $5`,
-    [q, tag, q ? escapeLike(q) : null, limit + 1, offset]
+    [q, effectiveTag, q ? escapeLike(q) : null, limit + 1, offset]
   );
   return { images: rows.slice(0, limit).map(ser.galleryImage), hasMore: rows.length > limit };
 }
