@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import { ImagePlus, Lock, RotateCcw } from "lucide-react";
+import { Lock, RotateCcw } from "lucide-react";
 import heroDesktop from "@/public/brand/hero-desktop.jpg";
 import heroMobile from "@/public/brand/hero-mobile.jpg";
 import Button from "@/components/ui/Button";
@@ -160,7 +160,6 @@ export default function AnalysisHero() {
             className="w-full max-w-[460px]"
           >
             <Button size="lg" onClick={openPicker} className="w-full sm:w-auto min-w-[220px]">
-              <ImagePlus className="size-5" aria-hidden="true" />
               Instant price check
             </Button>
           </motion.div>

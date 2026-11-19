@@ -43,6 +43,9 @@ function calculateInvoice({ items = [], discount = null, shipping = null }) {
   const lines = items.map((it, index) => ({
     position: index,
     name: it.name,
+    imageUrl: it.imageUrl || null,
+    imageFileId: it.imageFileId || null,
+    note: it.note || null,
     unitPricePaise: it.unitPricePaise,
     quantity: it.quantity,
     requestedRate: it.gstRate == null ? null : Number(it.gstRate),
@@ -79,6 +82,9 @@ function calculateInvoice({ items = [], discount = null, shipping = null }) {
     return {
       position: l.position,
       name: l.name,
+      imageUrl: l.imageUrl,
+      imageFileId: l.imageFileId,
+      note: l.note,
       unitPricePaise: l.unitPricePaise,
       quantity: l.quantity,
       gstRate: rate,

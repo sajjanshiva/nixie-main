@@ -1,12 +1,14 @@
 "use client";
 // Popups on the invoice editor: item, discount, shipping. Prices are typed in rupees (paise allowed).
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { ImagePlus, Loader2, X } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import Field from "@/components/ui/Field";
-import Input from "@/components/ui/Input";
+import Input, { Textarea } from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import Button from "@/components/ui/Button";
-import { toPaise } from "@/lib/adminApi";
+import { toPaise, adminApi } from "@/lib/adminApi";
+import { checkImageFile, compressImage } from "@/lib/compress";
 import { cn } from "@/lib/cn";
 
 function MoneyInput({ value, onChange, ...props }) {
@@ -47,22 +49,84 @@ function Actions({ onClose, label = "Save" }) {
 
 export function ItemDialog({ state, item, suggestedRate, onClose, onSave }) {
   const open = !!state;
-  const [v, setV] = useState({ name: "", price: "", quantity: "1", gst: "auto" });
+  const [v, setV] = useState({
+    name: "",
+    price: "",
+    quantity: "1",
+    gst: "auto",
+    imageUrl: "",
+    imageFileId: "",
+    note: "",
+  });
   const [e, setE] = useState({});
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (!open) return;
     setE({});
+    setUploading(false);
     setV(
       item
-        ? { name: item.name, price: item.price, quantity: String(item.quantity), gst: item.gstRate ? String(item.gstRate) : "auto" }
-        : { name: "", price: "", quantity: "1", gst: "auto" }
+        ? {
+            name: item.name || "",
+            price: item.price || "",
+            quantity: String(item.quantity || "1"),
+            gst: item.gstRate ? String(item.gstRate) : "auto",
+            imageUrl: item.imageUrl || "",
+            imageFileId: item.imageFileId || "",
+            note: item.note || "",
+          }
+        : {
+            name: "",
+            price: "",
+            quantity: "1",
+            gst: "auto",
+            imageUrl: "",
+            imageFileId: "",
+            note: "",
+          }
     );
   }, [open, item]);
 
   // Preview of the automatic rate (price per piece, before any invoice discount)
   const p = toPaise(v.price);
   const autoGuess = suggestedRate || (p !== null ? (p <= 250000 ? 5 : 18) : null);
+
+  async function handleImagePick(ev) {
+    const file = ev.target.files?.[0];
+    if (!file) return;
+    const check = checkImageFile(file);
+    if (check) {
+      setE((prev) => ({ ...prev, image: check }));
+      return;
+    }
+    setE((prev) => {
+      const next = { ...prev };
+      delete next.image;
+      return next;
+    });
+    setUploading(true);
+    try {
+      const processed =
+        file.size > 2 * 1024 * 1024
+          ? await compressImage(file, { maxDimension: 1600, quality: 0.88 })
+          : file;
+      const fd = new FormData();
+      fd.append("photo", processed);
+      const res = await adminApi("/invoices/upload-image", { method: "POST", body: fd });
+      setV((prev) => ({ ...prev, imageUrl: res.url, imageFileId: res.fileId }));
+    } catch (err) {
+      setE((prev) => ({ ...prev, image: err.message || "Failed to upload image" }));
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  function removeImage() {
+    setV((prev) => ({ ...prev, imageUrl: "", imageFileId: "" }));
+  }
 
   function submit(ev) {
     ev.preventDefault();
@@ -73,24 +137,102 @@ export function ItemDialog({ state, item, suggestedRate, onClose, onSave }) {
     if (!Number.isInteger(q) || q < 1 || q > 999) err.quantity = "1 to 999";
     setE(err);
     if (Object.keys(err).length) return;
-    onSave({ name: v.name.trim(), price: v.price, quantity: q, gstRate: v.gst === "auto" ? null : Number(v.gst) });
+    onSave({
+      name: v.name.trim(),
+      price: v.price,
+      quantity: q,
+      gstRate: v.gst === "auto" ? null : Number(v.gst),
+      imageUrl: v.imageUrl || null,
+      imageFileId: v.imageFileId || null,
+      note: v.note.trim() || null,
+    });
   }
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent title={item ? "Edit item" : "Add item"}>
         <form onSubmit={submit} noValidate className="flex flex-col gap-4">
+          {/* 1. Item name */}
           <Field label="Item name" error={e.name}>
-            <Input value={v.name} maxLength={200} onChange={(x) => setV({ ...v, name: x.target.value })} placeholder="e.g. Custom lehenga" autoFocus />
+            <Input
+              value={v.name}
+              maxLength={200}
+              onChange={(x) => setV({ ...v, name: x.target.value })}
+              placeholder="e.g. Custom lehenga"
+              autoFocus
+            />
           </Field>
+
+          {/* 2. Item photo upload */}
+          <Field label="Item photo (optional)" error={e.image}>
+            <div className="flex flex-col gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImagePick}
+              />
+              {v.imageUrl ? (
+                <div className="relative flex items-center justify-between gap-3 rounded-xl border border-line bg-surface p-2.5">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <img
+                      src={v.imageUrl}
+                      alt="Item reference"
+                      className="size-14 rounded-lg object-cover border border-line shrink-0"
+                    />
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[13.5px] font-semibold text-ink truncate">Photo attached</span>
+                      <span className="text-[12px] text-muted">Ready for invoice</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted hover:bg-danger-soft hover:text-danger"
+                    aria-label="Remove photo"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  disabled={uploading}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-[14px] border border-dashed border-line-strong bg-surface px-4 text-[14px] font-medium text-muted transition hover:border-teal-deep hover:bg-cyan-soft/40 hover:text-ink disabled:opacity-50 cursor-pointer"
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin text-teal-deep" />
+                      <span>Uploading photo...</span>
+                    </>
+                  ) : (
+                    <>
+                      <ImagePlus className="size-4.5 text-teal-deep" />
+                      <span>Upload item photo</span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          </Field>
+
+          {/* 3. Price per piece & Quantity */}
           <div className="grid grid-cols-[1fr_110px] gap-3">
             <Field label="Price per piece" error={e.price}>
               <MoneyInput value={v.price} onChange={(price) => setV({ ...v, price })} />
             </Field>
             <Field label="Quantity" error={e.quantity}>
-              <Input inputMode="numeric" value={v.quantity} onChange={(x) => setV({ ...v, quantity: x.target.value.replace(/\D/g, "").slice(0, 3) })} />
+              <Input
+                inputMode="numeric"
+                value={v.quantity}
+                onChange={(x) => setV({ ...v, quantity: x.target.value.replace(/\D/g, "").slice(0, 3) })}
+              />
             </Field>
           </div>
+
+          {/* 4. GST rate */}
           <Field label="GST rate" hint="Auto: 5% if the price per piece after discount is ₹2,500 or less, otherwise 18%.">
             <Select
               value={v.gst}
@@ -102,6 +244,18 @@ export function ItemDialog({ state, item, suggestedRate, onClose, onSave }) {
               ]}
             />
           </Field>
+
+          {/* 5. Item note */}
+          <Field label="Item note (optional)" hint="Visible to customer on the invoice">
+            <Textarea
+              rows={2}
+              value={v.note}
+              maxLength={1000}
+              onChange={(x) => setV({ ...v, note: x.target.value })}
+              placeholder="e.g. Emerald green raw silk, sweetheart neckline, 3-inch margin..."
+            />
+          </Field>
+
           <Actions onClose={onClose} label={item ? "Save item" : "Add item"} />
         </form>
       </DialogContent>

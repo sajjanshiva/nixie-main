@@ -14,7 +14,7 @@ const NAV = [
   { href: "/#how-it-works", label: "How it works" },
   { href: "/gallery", label: "Get Inspired" },
   { href: "/#faqs", label: "FAQs" },
-  { href: "/collaborate", label: "Work with us" },
+  { href: "/careers", label: "Work with us" },
   { href: "/contact", label: "Contact us" },
 ];
 
@@ -49,7 +49,7 @@ export default function Header() {
           {NAV.map((n) => {
             const active =
               (n.href === "/gallery" && pathname.startsWith("/gallery")) ||
-              (n.href === "/collaborate" && pathname.startsWith("/collaborate")) ||
+              (n.href === "/careers" && pathname.startsWith("/careers")) ||
               (n.href === "/contact" && pathname.startsWith("/contact"));
 
             return (

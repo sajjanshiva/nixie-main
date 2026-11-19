@@ -80,6 +80,9 @@ function invoiceItem(it) {
   return {
     id: it.id,
     name: it.name,
+    imageUrl: it.image_url,
+    imageFileId: it.image_file_id,
+    note: it.note,
     unitPricePaise: it.unit_price_paise,
     quantity: it.quantity,
     gstRate: it.gst_rate,
@@ -197,6 +200,8 @@ function publicInvoice(inv, items = []) {
     },
     items: items.map((it) => ({
       name: it.name,
+      imageUrl: it.image_url,
+      note: it.note,
       quantity: it.quantity,
       unitPricePaise: it.unit_price_paise,
       linePaise: it.base_paise,

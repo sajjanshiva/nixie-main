@@ -6,6 +6,7 @@ import InstagramIcon from "@/components/ui/InstagramIcon";
 
 const QUICK_LINKS = [
   { href: "/about-nixie", label: "About Nixie" },
+  { href: "/careers", label: "Work with us (Careers)" },
   { href: "/collaborate", label: "Collaborate with Nixie" },
   { href: "/#faqs", label: "FAQs" },
   { href: "/shipping", label: "Shipping & Delivery" },

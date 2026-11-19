@@ -1,9 +1,10 @@
 "use client";
 // A sent / partly paid / paid / cancelled invoice: read-only, with actions.
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Ban, Copy, Files, HandCoins, Mail, RotateCw } from "lucide-react";
+import { ArrowLeft, Ban, Copy, Files, HandCoins, Mail, RotateCw, X, ZoomIn } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import { useToast } from "@/components/providers/ToastProvider";
@@ -20,8 +21,18 @@ export default function InvoiceDetail({ invoice: inv, onChange }) {
   const [busy, setBusy] = useState(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [recordOpen, setRecordOpen] = useState(false);
+  const [activeImage, setActiveImage] = useState(null);
   const open = inv.status === "sent" || inv.status === "partially_paid";
   const t = inv.totals;
+
+  useEffect(() => {
+    if (!activeImage) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") setActiveImage(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [activeImage]);
 
   async function copyLink() {
     try {
@@ -119,7 +130,35 @@ export default function InvoiceDetail({ invoice: inv, onChange }) {
                 <tbody>
                   {inv.items.map((it) => (
                     <tr key={it.id} className="border-b border-line last:border-0">
-                      <td className="px-5 py-3.5 font-semibold">{it.name}</td>
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-3.5">
+                          {it.imageUrl && (
+                            <button
+                              type="button"
+                              onClick={() => setActiveImage({ url: it.imageUrl, name: it.name })}
+                              className="group relative size-16 shrink-0 overflow-hidden rounded-[12px] border border-line bg-mint/20 shadow-2xs transition-all hover:scale-105 hover:shadow-xs cursor-pointer"
+                              aria-label={`View photo of ${it.name}`}
+                            >
+                              <img
+                                src={it.imageUrl}
+                                alt={it.name}
+                                className="h-full w-full object-cover transition duration-200 group-hover:scale-105"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/25 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                                <ZoomIn className="size-4 text-white drop-shadow-sm" />
+                              </div>
+                            </button>
+                          )}
+                          <div className="min-w-0">
+                            <span className="font-semibold text-ink block">{it.name}</span>
+                            {it.note && (
+                              <span className="text-[12.5px] text-muted italic block mt-0.5">
+                                Note: {it.note}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
                       <td className="px-3 py-3.5 text-right tabular-nums">{it.quantity}</td>
                       <td className="px-3 py-3.5 text-right tabular-nums">{paise(it.unitPricePaise)}</td>
                       <td className="px-3 py-3.5 text-right tabular-nums">
@@ -264,6 +303,48 @@ export default function InvoiceDetail({ invoice: inv, onChange }) {
           toast.success(`Payment recorded. ${updated.label} is now paid.`);
         }}
       />
+
+      {/* Fullscreen DP-style Lightbox Modal */}
+      <AnimatePresence>
+        {activeImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setActiveImage(null)}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 p-5 pt-20 pb-8 backdrop-blur-md sm:p-10 sm:pt-24"
+          >
+            <button
+              type="button"
+              onClick={() => setActiveImage(null)}
+              className="absolute right-5 top-5 z-20 flex size-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-all hover:bg-white/25 hover:scale-105 active:scale-95 sm:right-7 sm:top-7 cursor-pointer"
+              aria-label="Close photo preview"
+            >
+              <X className="size-6" />
+            </button>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 10 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative flex max-h-[82vh] max-w-[92vw] flex-col items-center my-auto"
+            >
+              <img
+                src={activeImage.url}
+                alt={activeImage.name || "Outfit photo"}
+                className="max-h-[68vh] sm:max-h-[72vh] max-w-full rounded-2xl object-contain shadow-2xl ring-1 ring-white/15"
+              />
+              {activeImage.name && (
+                <p className="mt-4 text-center font-display text-[22px] font-semibold text-white drop-shadow-md">
+                  {activeImage.name}
+                </p>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

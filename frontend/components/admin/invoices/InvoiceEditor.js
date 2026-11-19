@@ -26,6 +26,9 @@ function fromInvoice(inv) {
     items: inv.items.map((it) => ({
       key: newKey(),
       name: it.name,
+      imageUrl: it.imageUrl || "",
+      imageFileId: it.imageFileId || "",
+      note: it.note || "",
       price: paiseToInput(it.unitPricePaise),
       quantity: it.quantity,
       gstRate: it.gstAuto ? null : it.gstRate,
@@ -51,7 +54,15 @@ function toBody(s) {
     : null;
   return {
     customer: { name: s.customer.name.trim(), email: s.customer.email.trim(), phone: s.customer.phone.trim() ? cleanPhone(s.customer.phone) : null },
-    items: s.items.map((it) => ({ name: it.name.trim(), unitPricePaise: toPaise(it.price) ?? 0, quantity: Number(it.quantity) || 1, gstRate: it.gstRate })),
+    items: s.items.map((it) => ({
+      name: it.name.trim(),
+      imageUrl: it.imageUrl || null,
+      imageFileId: it.imageFileId || null,
+      note: it.note ? it.note.trim() : null,
+      unitPricePaise: toPaise(it.price) ?? 0,
+      quantity: Number(it.quantity) || 1,
+      gstRate: it.gstRate,
+    })),
     discount,
     shipping: s.shipping ? { name: s.shipping.name.trim(), pricePaise: toPaise(s.shipping.price) ?? 0 } : null,
     internalNote: s.internalNote.trim() || undefined,
@@ -242,8 +253,20 @@ export default function InvoiceEditor({ invoice }) {
                   const bad = Object.keys(errors).some((k) => k.startsWith(`items.${i}.`));
                   return (
                     <li key={it.key} className={cn("flex items-center gap-3 border-t border-line py-3.5 first:border-0", bad && "rounded-xl bg-danger-soft px-2")}>
+                      {it.imageUrl && (
+                        <img
+                          src={it.imageUrl}
+                          alt={it.name}
+                          className="size-14 rounded-[10px] object-cover border border-line shrink-0"
+                        />
+                      )}
                       <button type="button" onClick={() => setItemDialog({ index: i })} className="min-w-0 flex-1 text-left">
                         <span className="block truncate text-[15.5px] font-semibold">{it.name || "Untitled item"}</span>
+                        {it.note && (
+                          <span className="block truncate text-[12.5px] text-muted italic mt-0.5">
+                            Note: {it.note}
+                          </span>
+                        )}
                         <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[13.5px] text-muted">
                           <span className="tabular-nums">
                             {it.quantity} × {paise(toPaise(it.price) ?? 0)}

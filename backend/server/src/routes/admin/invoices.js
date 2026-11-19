@@ -18,14 +18,32 @@ const templates = require("../../services/emailTemplates");
 const env = require("../../config/env");
 const C = require("../../config/constants");
 const ser = require("../serializers");
+const { upload } = require("../../middleware/upload");
+const { processImage } = require("../../services/images");
+const { uploadImage } = require("../../services/imagekit");
 
 const router = express.Router();
+
+// POST /api/admin/invoices/upload-image (multipart "photo") → { url, fileId }
+router.post(
+  "/upload-image",
+  upload.single("photo"),
+  ah(async (req, res) => {
+    if (!req.file) throw new AppError(400, "BAD_REQUEST", "Image file is required.");
+    const image = await processImage(req.file, { maxSide: 1600, quality: 85 });
+    const { url, fileId } = await uploadImage(image.buffer, "invoices", "webp");
+    res.json({ url, fileId });
+  })
+);
 
 // ------------------------------------------------------------------ schemas
 const paise = z.number().int("Amount must be in paise (whole number)").min(0).max(1_000_000_000);
 
 const itemSchema = z.object({
   name: z.string().trim().min(1, "Item name is required").max(200),
+  imageUrl: z.string().url().max(1000).nullable().optional(),
+  imageFileId: z.string().max(200).nullable().optional(),
+  note: optionalText(1000),
   unitPricePaise: paise,
   quantity: z.number().int().min(1).max(999),
   gstRate: z.union([z.literal(5), z.literal(18)]).nullable().optional(), // null = automatic
@@ -117,13 +135,16 @@ async function writeTotalsAndItems(client, invoiceId, data) {
   for (const l of calc.lines) {
     await client.query(
       `INSERT INTO invoice_items
-         (invoice_id, position, name, unit_price_paise, quantity, gst_rate, gst_auto,
+         (invoice_id, position, name, image_url, image_file_id, note, unit_price_paise, quantity, gst_rate, gst_auto,
           base_paise, discount_paise, taxable_paise, gst_paise)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
       [
         invoiceId,
         l.position,
         l.name,
+        l.imageUrl || null,
+        l.imageFileId || null,
+        l.note || null,
         l.unitPricePaise,
         l.quantity,
         l.gstRate,
@@ -467,6 +488,9 @@ router.post(
       customer: { name: inv.customer_name, email: inv.customer_email, phone: inv.customer_phone },
       items: items.map((it) => ({
         name: it.name,
+        imageUrl: it.image_url,
+        imageFileId: it.image_file_id,
+        note: it.note,
         unitPricePaise: it.unit_price_paise,
         quantity: it.quantity,
         gstRate: it.gst_auto ? null : it.gst_rate,

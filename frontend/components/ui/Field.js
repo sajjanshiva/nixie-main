@@ -6,8 +6,14 @@ export default function Field({ label, hint, error, optional, className, childre
   const auto = useId();
   const id = idProp || auto;
   const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined;
+  const isDomElement = typeof children?.type === "string";
   const control = isValidElement(children)
-    ? cloneElement(children, { id, "aria-invalid": error ? true : undefined, "aria-describedby": describedBy, invalid: !!error })
+    ? cloneElement(children, {
+        id: children.props?.id || id,
+        "aria-invalid": error ? true : undefined,
+        "aria-describedby": describedBy,
+        ...(isDomElement ? {} : { invalid: !!error }),
+      })
     : children;
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
